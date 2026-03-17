@@ -122,6 +122,22 @@ func main() {
 
 	setupLogger(cfg.Log.Level, logWriter)
 
+	// 🆕 Initialize project management system
+	projectMgmt, err := SetupProjectManagement(cfg.DataDir)
+	if err != nil {
+		slog.Error("failed to initialize project management", "error", err)
+		// Non-fatal: continue without project management
+		projectMgmt = nil
+	}
+	// Ensure cleanup on exit
+	if projectMgmt != nil {
+		defer func() {
+			if err := projectMgmt.Close(); err != nil {
+				slog.Error("failed to close project management", "error", err)
+			}
+		}()
+	}
+
 	engines := make([]*core.Engine, 0, len(cfg.Projects))
 
 	for _, proj := range cfg.Projects {
@@ -157,6 +173,12 @@ func main() {
 				slog.Error("failed to create platform", "project", proj.Name, "type", pc.Type, "error", err)
 				os.Exit(1)
 			}
+
+			// 🆕 Wrap Feishu platform with project management routing
+			if projectMgmt != nil && pc.Type == "feishu" {
+				p = WrapFeishuPlatform(p, projectMgmt)
+			}
+
 			platforms = append(platforms, p)
 		}
 
