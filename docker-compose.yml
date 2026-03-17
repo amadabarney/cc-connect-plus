@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  feishu-adapter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: feishu-adapter
+    restart: unless-stopped
+
+    # 环境变量
+    environment:
+      # 飞书应用凭证（必需）
+      - FEISHU_APP_ID=${FEISHU_APP_ID}
+      - FEISHU_APP_SECRET=${FEISHU_APP_SECRET}
+
+      # Agent 池配置（可选）
+      - MAX_AGENTS=${MAX_AGENTS:-5}
+      - IDLE_TIMEOUT=${IDLE_TIMEOUT:-7200s}
+
+      # 用户权限控制（可选）
+      - ALLOWED_USERS=${ALLOWED_USERS:-}
+      - ADMIN_USERS=${ADMIN_USERS:-}
+
+      # 时区
+      - TZ=${TZ:-Asia/Shanghai}
+
+      # 数据目录
+      - DATA_DIR=/data
+
+    # Volume 挂载
+    volumes:
+      # 项目工作空间（必需）
+      - ${WORKSPACE_DIR:-~/projects}:/workspace
+
+      # 持久化数据（数据库、配置等）
+      - ./data:/data
+
+      # CLI 工具认证凭证（只读）
+      # 在宿主机上运行 claude login, gh auth login 等命令后挂载
+      - ~/.claude:/root/.claude:ro
+      - ~/.config/gh:/root/.config/gh:ro
+      - ~/.config/gcloud:/root/.config/gcloud:ro
+
+      # 配置文件（可选，如果使用 TOML 配置）
+      - ${CONFIG_FILE:-./config.toml}:/app/config.toml:ro
+
+    # 端口映射（如果使用 webhook 模式）
+    # ports:
+    #   - "8080:8080"
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # 资源限制（可选）
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 4G
+    #     reservations:
+    #       cpus: '1'
+    #       memory: 2G
+
+# 网络配置（可选）
+networks:
+  default:
+    name: feishu-adapter-network
