@@ -68,8 +68,8 @@ func (m *Manager) CreateProject(name, workDir, agentType string) (*db.Project, e
 	// 插入项目记录
 	result, err := tx.Exec(`
 		INSERT INTO projects (name, work_dir, agent_type, agent_mode, status)
-		VALUES (?, ?, ?, 'default', 'stopped')
-	`, name, absPath, agentType)
+		VALUES (?, ?, ?, ?, 'stopped')
+	`, name, absPath, agentType, defaultAgentMode(agentType))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create project: %w", err)
 	}
@@ -241,4 +241,19 @@ func (m *Manager) TouchActivity(id int) error {
 		WHERE id = ?
 	`, time.Now(), id)
 	return err
+}
+
+// defaultAgentMode 返回各 agent 默认的可写权限模式。
+// 不同 agent 的 CLI flag 名称不同，统一映射为可写模式，避免沙箱限制。
+func defaultAgentMode(agentType string) string {
+	switch agentType {
+	case "claudecode":
+		return "bypassPermissions"
+	case "codex", "gemini":
+		// codex: maps to --dangerously-bypass-approvals-and-sandbox
+		// gemini: maps to --approval-mode yolo
+		return "yolo"
+	default:
+		return "default"
+	}
 }
