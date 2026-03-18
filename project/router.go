@@ -81,7 +81,10 @@ func (r *Router) handleAgentEvents(ctx context.Context, platform core.Platform, 
 		case core.EventText:
 			// Agent 输出文本
 			if event.Content != "" {
-				platform.Send(ctx, msg.ReplyCtx, event.Content)
+				slog.Debug("sending agent text to platform", "content_preview", event.Content[:min(len(event.Content), 50)])
+				if err := platform.Send(ctx, msg.ReplyCtx, event.Content); err != nil {
+					slog.Error("failed to send agent text", "error", err)
+				}
 			}
 
 		case core.EventPermissionRequest:
