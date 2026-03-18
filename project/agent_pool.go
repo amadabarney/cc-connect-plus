@@ -107,9 +107,10 @@ func (p *AgentPool) startNewAgent(ctx context.Context, projectID int) (*AgentIns
 		return nil, fmt.Errorf("failed to create agent: %w", err)
 	}
 
-	// 启动会话（使用项目 ID 作为 session ID）
-	sessionID := fmt.Sprintf("project-%d", projectID)
-	session, err := agent.StartSession(ctx, sessionID)
+	// 启动会话（空字符串让 agent 自行管理 session ID）
+	// 注意：不能传 "project-1" 等自定义字符串给 Claude Code，
+	// 因为它要求真实的 session UUID（--resume），传错会静默退出。
+	session, err := agent.StartSession(ctx, "")
 	if err != nil {
 		return nil, fmt.Errorf("failed to start session: %w", err)
 	}
