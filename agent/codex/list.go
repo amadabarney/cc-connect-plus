@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chenhg5/cc-connect/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 // listCodexSessions scans ~/.codex/sessions/ for JSONL transcript files

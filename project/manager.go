@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amada/feishu-adapter/db"
+	"github.com/amadabarney/cc-connect-plus/db"
 )
 
 // Manager 项目管理器

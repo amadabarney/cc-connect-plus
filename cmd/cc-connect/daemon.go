@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chenhg5/cc-connect/daemon"
+	"github.com/amadabarney/cc-connect-plus/daemon"
 )
 
 func runDaemon(args []string) {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/amada/feishu-adapter/db"
+	"github.com/amadabarney/cc-connect-plus/db"
 )
 
 // ContextManager 用户上下文管理器

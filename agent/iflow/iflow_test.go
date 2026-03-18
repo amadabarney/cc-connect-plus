@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/chenhg5/cc-connect/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 func TestNormalizeMode(t *testing.T) {

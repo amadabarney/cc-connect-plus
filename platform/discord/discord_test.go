@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/chenhg5/cc-connect/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 // ── Thread tests (upstream) ──────────────────────────────────

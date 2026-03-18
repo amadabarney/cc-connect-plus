@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/amada/feishu-adapter/core"
-	"github.com/amada/feishu-adapter/db"
+	"github.com/amadabarney/cc-connect-plus/core"
+	"github.com/amadabarney/cc-connect-plus/db"
 )
 
 // AgentInstance 包装了 Agent 和其会话

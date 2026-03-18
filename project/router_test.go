@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/amada/feishu-adapter/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 type stubAgentSession struct {

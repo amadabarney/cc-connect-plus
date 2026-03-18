@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/amada/feishu-adapter/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 type stubCorePlatform struct{ replies []string }

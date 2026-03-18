@@ -3,7 +3,7 @@ package project
 import (
 	"testing"
 
-	"github.com/amada/feishu-adapter/db"
+	"github.com/amadabarney/cc-connect-plus/db"
 )
 
 func mustInitDB(t *testing.T) *db.Database {

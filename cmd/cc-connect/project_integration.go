@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/amada/feishu-adapter/core"
-	"github.com/amada/feishu-adapter/db"
-	"github.com/amada/feishu-adapter/project"
+	"github.com/amadabarney/cc-connect-plus/core"
+	"github.com/amadabarney/cc-connect-plus/db"
+	"github.com/amadabarney/cc-connect-plus/project"
 )
 
 // ProjectManagement 项目管理集成

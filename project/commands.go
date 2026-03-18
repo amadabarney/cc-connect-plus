@@ -7,16 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amada/feishu-adapter/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 // CommandHandler 项目管理命令处理器
 type CommandHandler struct {
-	projectMgr  *Manager
-	contextMgr  *ContextManager
-	agentPool   *AgentPool
-	enginePool  map[int]*core.Engine // projectID -> Engine
-	createEngine func(projectID int) (*core.Engine, error) // 动态创建 Engine 的回调
+	projectMgr *Manager
+	contextMgr *ContextManager
+	agentPool  *AgentPool
 }
 
 // NewCommandHandler 创建命令处理器
@@ -29,13 +27,7 @@ func NewCommandHandler(
 		projectMgr: projectMgr,
 		contextMgr: contextMgr,
 		agentPool:  agentPool,
-		enginePool: make(map[int]*core.Engine),
 	}
-}
-
-// SetEngineCreator 设置 Engine 创建回调
-func (h *CommandHandler) SetEngineCreator(fn func(projectID int) (*core.Engine, error)) {
-	h.createEngine = fn
 }
 
 // HandleCommand 处理项目管理命令

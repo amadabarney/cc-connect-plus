@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/amada/feishu-adapter/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 // Router 消息路由器

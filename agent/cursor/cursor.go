@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 	"unicode/utf8"
 
-	"github.com/chenhg5/cc-connect/core"
+	"github.com/amadabarney/cc-connect-plus/core"
 )
 
 func init() {

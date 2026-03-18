@@ -2,4 +2,4 @@
 
 package main
 
-import _ "github.com/chenhg5/cc-connect/agent/cursor"
+import _ "github.com/amadabarney/cc-connect-plus/agent/cursor"
