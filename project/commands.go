@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/amada/feishu-adapter/core"
-	"github.com/amada/feishu-adapter/db"
 )
 
 // CommandHandler 项目管理命令处理器
@@ -108,17 +107,10 @@ func (h *CommandHandler) createProject(ctx context.Context, platform core.Platfo
 
 	// 检查目录是否存在
 	if err := h.projectMgr.CreateWorkDir(absPath); err != nil {
-		// 询问是否创建
-		card := &core.Card{
-			Title: "📁 目录不存在",
-			Sections: []core.CardSection{
-				{Content: fmt.Sprintf("目录 `%s` 不存在，是否创建？", absPath)},
-			},
-			Actions: []core.CardAction{
-				{ID: fmt.Sprintf("create_dir:%s:%s:%s", name, absPath, agentType), Label: "✅ 创建"},
-				{ID: "cancel", Label: "❌ 取消"},
-			},
-		}
+		card := core.NewCard().
+			Title("📁 目录不存在", "red").
+			Markdown(fmt.Sprintf("目录 `%s` 无法创建，请先手动创建目录", absPath)).
+			Build()
 
 		if cs, ok := platform.(core.CardSender); ok {
 			return cs.ReplyCard(ctx, msg.ReplyCtx, card)
@@ -159,7 +151,9 @@ func (h *CommandHandler) listProjects(ctx context.Context, platform core.Platfor
 	// 获取当前项目
 	currentProjectID, _ := h.contextMgr.GetCurrentProject(msg.UserID)
 
-	var sections []core.CardSection
+	builder := core.NewCard().Title("📁 项目列表", "blue")
+	var textParts []string
+
 	for _, p := range projects {
 		isCurrent := currentProjectID != nil && *currentProjectID == p.ID
 		statusIcon := "⭕"
@@ -174,7 +168,7 @@ func (h *CommandHandler) listProjects(ctx context.Context, platform core.Platfor
 		if p.LastActiveAt != nil {
 			duration := time.Since(*p.LastActiveAt)
 			if duration < time.Minute {
-			lastActive = "刚刚"
+				lastActive = "刚刚"
 			} else if duration < time.Hour {
 				lastActive = fmt.Sprintf("%d分钟前", int(duration.Minutes()))
 			} else if duration < 24*time.Hour {
@@ -186,28 +180,21 @@ func (h *CommandHandler) listProjects(ctx context.Context, platform core.Platfor
 			lastActive = "从未使用"
 		}
 
-		section := core.CardSection{
-			Title: fmt.Sprintf("%s %s (%s)", statusIcon, p.Name, agentName),
-			Content: fmt.Sprintf("路径: `%s`\n状态: %s\n最后活跃: %s", p.WorkDir, statusText, lastActive),
-		}
-
-		sections = append(sections, section)
-	}
-
-	card := &core.Card{
-		Title:    "📁 项目列表",
-		Sections: sections,
+		title := fmt.Sprintf("%s %s (%s)", statusIcon, p.Name, agentName)
+		content := fmt.Sprintf("路径: `%s`\n状态: %s\n最后活跃: %s", p.WorkDir, statusText, lastActive)
+		builder.Markdown(fmt.Sprintf("**%s**\n%s", title, content)).Divider()
+		textParts = append(textParts, fmt.Sprintf("%s\n%s", title, content))
 	}
 
 	if cs, ok := platform.(core.CardSender); ok {
-		return cs.ReplyCard(ctx, msg.ReplyCtx, card)
+		return cs.ReplyCard(ctx, msg.ReplyCtx, builder.Build())
 	}
 
 	// 降级为文本
 	var text strings.Builder
 	text.WriteString("📁 项目列表\n\n")
-	for _, section := range sections {
-		text.WriteString(fmt.Sprintf("%s\n%s\n\n", section.Title, section.Content))
+	for _, part := range textParts {
+		text.WriteString(part + "\n\n")
 	}
 
 	return platform.Reply(ctx, msg.ReplyCtx, text.String())

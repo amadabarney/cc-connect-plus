@@ -77,37 +77,39 @@ func (r *Router) Route(ctx context.Context, platform core.Platform, msg *core.Me
 // handleAgentEvents 处理 Agent 事件
 func (r *Router) handleAgentEvents(ctx context.Context, platform core.Platform, msg *core.Message, instance *AgentInstance) {
 	for event := range instance.Session.Events() {
-		switch ev := event.(type) {
-		case *core.TextEvent:
+		switch event.Type {
+		case core.EventText:
 			// Agent 输出文本
-			if ev.Text != "" {
-				platform.Send(ctx, msg.ReplyCtx, ev.Text)
+			if event.Content != "" {
+				platform.Send(ctx, msg.ReplyCtx, event.Content)
 			}
 
-		case *core.PermissionRequestEvent:
+		case core.EventPermissionRequest:
 			// Agent 请求权限（工具调用）
 			// 这里可以实现交互式审批，或根据 mode 自动批准
-			slog.Info("permission request", "tool", ev.Tool, "request_id", ev.RequestID)
+			slog.Info("permission request", "tool", event.ToolName, "request_id", event.RequestID)
 
 			// 简单实现：自动批准（TODO: 实现交互式审批）
 			result := core.PermissionResult{
 				Behavior:     "allow",
-				UpdatedInput: ev.Input,
+				UpdatedInput: event.ToolInputRaw,
 			}
-			instance.Session.RespondPermission(ev.RequestID, result)
+			instance.Session.RespondPermission(event.RequestID, result)
 
-		case *core.ErrorEvent:
+		case core.EventError:
 			// Agent 错误
-			slog.Error("agent error", "error", ev.Error)
-			platform.Send(ctx, msg.ReplyCtx, fmt.Sprintf("❌ 错误: %v", ev.Error))
+			slog.Error("agent error", "error", event.Error)
+			platform.Send(ctx, msg.ReplyCtx, fmt.Sprintf("❌ 错误: %v", event.Error))
 
-		case *core.DoneEvent:
+		case core.EventResult:
 			// 对话结束
-			slog.Debug("conversation done")
-			return
+			if event.Done {
+				slog.Debug("conversation done")
+				return
+			}
 
 		default:
-			slog.Debug("unknown event type", "type", fmt.Sprintf("%T", event))
+			slog.Debug("unknown event type", "type", string(event.Type))
 		}
 	}
 }
