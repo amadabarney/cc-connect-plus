@@ -17,9 +17,9 @@ type Manager struct {
 	allowedBase string
 }
 
-// NewManager 创建项目管理器
+// NewManager 创建项目管理器（不限制工作目录路径）
 func NewManager(database *db.Database) *Manager {
-	return &Manager{db: database, allowedBase: "/workspace"}
+	return &Manager{db: database, allowedBase: ""}
 }
 
 // NewManagerWithBase 创建项目管理器（可自定义 allowedBase，供测试使用）
@@ -53,8 +53,8 @@ func (m *Manager) CreateProject(name, workDir, agentType string) (*db.Project, e
 		return nil, fmt.Errorf("invalid work directory path: %w", err)
 	}
 
-	// 检查目录是否在允许的工作空间内
-	if !strings.HasPrefix(absPath, m.allowedBase) {
+	// 检查目录是否在允许的工作空间内（allowedBase 为空时不限制）
+	if m.allowedBase != "" && !strings.HasPrefix(absPath, m.allowedBase) {
 		return nil, fmt.Errorf("work directory must be under %s", m.allowedBase)
 	}
 
