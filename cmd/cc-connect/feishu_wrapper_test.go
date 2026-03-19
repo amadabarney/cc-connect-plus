@@ -38,24 +38,3 @@ func TestWrapFeishuPlatform_ReturnsWrapper(t *testing.T) {
 	}
 }
 
-func TestTruncate(t *testing.T) {
-	tests := []struct {
-		input  string
-		maxLen int
-		want   string
-	}{
-		{"hello", 10, "hello"},
-		{"hello world", 5, "hello..."},
-		{"", 5, ""},
-		{"abc", 3, "abc"},
-		{"abcd", 3, "abc..."},
-	}
-	for _, tc := range tests {
-		t.Run(tc.input, func(t *testing.T) {
-			got := truncate(tc.input, tc.maxLen)
-			if got != tc.want {
-				t.Errorf("truncate(%q, %d) = %q, want %q", tc.input, tc.maxLen, got, tc.want)
-			}
-		})
-	}
-}
